@@ -1,4 +1,5 @@
 package FileManagerIO;
+
 import java.io.*;
 
 
@@ -10,50 +11,49 @@ public class FileManager {
         currentDirectory = "/";
     }
 
-    public void executeCommands()  {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    public void start() {
 
         while (true) {
             System.out.println(currentDirectory);
             String line = null;
-            try {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
                 line = reader.readLine();
+                String[] commandSplit = line.trim().split("\\s+");
+                if (commandSplit.length == 0) {
+                    continue;
+                }
+                String firstCommand = commandSplit[0];
+
+                switch (firstCommand) {
+                    case "cd":
+                        if (commandSplit.length > 1) {
+                            String target = commandSplit[1];
+                            changeDirectory(target);
+                        } else {
+                            System.out.println("Usage: cd <directory>");
+                        }
+                        break;
+                    case "cp":
+                        if (commandSplit.length > 2) {
+                            String source = commandSplit[1];
+                            String destination = commandSplit[2];
+                            copyFile(source, destination);
+                        } else {
+                            System.out.println("Usage: cd <source> <target>");
+                        }
+                        break;
+                    case "ls":
+                        listFiles();
+                        break;
+                    case "pwd":
+                        printWorkingDirectory();
+                        break;
+                    default:
+                        System.out.println("Unknown command " + firstCommand);
+                        break;
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }
-            String[] commandSplit = line.trim().split("\\s+");
-            if (commandSplit.length == 0) {
-                continue;
-            }
-            String firstCommand = commandSplit[0];
-
-            switch (firstCommand) {
-                case "cd":
-                    if (commandSplit.length > 1) {
-                        String target = commandSplit[1];
-                        changeDirectory(target);
-                    } else {
-                        System.out.println("Usage: cd <directory>");
-                    }
-                    break;
-                case "cp":
-                    if (commandSplit.length > 2) {
-                        String source = commandSplit[1];
-                        String destination = commandSplit[2];
-                        copyFile(source, destination);
-                    } else {
-                        System.out.println("Usage: cd <source> <target>");
-                    }
-                    break;
-                case "ls":
-                    listFiles();
-                    break;
-                case "pdw":
-                    printWorkingDirectory();
-                    break;
-                default:
-                    System.out.println("Unknown command " + firstCommand);
-                    break;
             }
         }
     }
@@ -91,8 +91,7 @@ public class FileManager {
         File sourceFile = new File(source);
         File destinatoinFile = new File(destination);
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(sourceFile));
-             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(destinatoinFile))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(sourceFile)); BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(destinatoinFile))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 bufferedWriter.write(line);
