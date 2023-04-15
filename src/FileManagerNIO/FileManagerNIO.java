@@ -8,10 +8,12 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class FileManagerNIO {
-
+    private static final Logger logger = Logger.getLogger(Logger.class.getName());
     private String currentDirectory;
 
     public FileManagerNIO() {
@@ -22,7 +24,7 @@ public class FileManagerNIO {
 
         while (true) {
 
-            System.out.println(currentDirectory);
+            logger.log(Level.INFO,currentDirectory);
             String line = null;
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
@@ -40,7 +42,7 @@ public class FileManagerNIO {
                             String path = commandSplit[1];
                             changeDirectory(path);
                         } else {
-                            System.out.println("Usage: cd <directory>");
+                            logger.log(Level.INFO,"Usage: cd <directory>");
                         }
                         break;
                     case "cp":
@@ -49,7 +51,7 @@ public class FileManagerNIO {
                             String target = commandSplit[1];
                             copyFiles(source, target);
                         } else {
-                            System.out.println("Usage: cd <source> <target>");
+                            logger.log(Level.INFO,"Usage: cd <source> <target>");
                         }
                         break;
                     case "ls":
@@ -59,7 +61,7 @@ public class FileManagerNIO {
                         printWorkingDirectory();
                         break;
                     default:
-                        System.out.println("Unknown command " + firstCommand);
+                        logger.log(Level.INFO,"Unknown command " + firstCommand);
                         break;
                 }
             } catch (IOException e) {
@@ -70,7 +72,7 @@ public class FileManagerNIO {
     }
 
     private void printWorkingDirectory() {
-        System.out.println(currentDirectory);
+        logger.log(Level.INFO,currentDirectory);
     }
 
     private void listFiles() {
@@ -82,7 +84,7 @@ public class FileManagerNIO {
             throw new RuntimeException(e);
         }
         for (Path file : stream) {
-            System.out.println(file.getFileName());
+            logger.log(Level.INFO, String.valueOf(file.getFileName()));
         }
     }
 
@@ -91,7 +93,7 @@ public class FileManagerNIO {
         Path pathTarget = Paths.get(target);
         try {
             Files.copy(pathSource, pathTarget);
-            System.out.println("File copied successfully.");
+            logger.log(Level.INFO,"File copied successfully.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +110,7 @@ public class FileManagerNIO {
         if (Files.isDirectory(file)) {
             currentDirectory = newPath;
         } else {
-            System.out.println("Error! " + newPath + " is not a directory");
+            logger.log(Level.INFO,"Error! " + newPath + " is not a directory");
         }
     }
 }
