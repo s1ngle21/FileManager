@@ -1,9 +1,13 @@
 package FileManagerIO;
 
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class FileManager {
+
+    private static final Logger logger = Logger.getLogger(Logger.class.getName());
 
     private String currentDirectory;
 
@@ -14,7 +18,9 @@ public class FileManager {
     public void start() {
 
         while (true) {
-            System.out.println(currentDirectory);
+
+            logger.log(Level.INFO, currentDirectory);
+
             String line = null;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
                 line = reader.readLine();
@@ -30,7 +36,7 @@ public class FileManager {
                             String target = commandSplit[1];
                             changeDirectory(target);
                         } else {
-                            System.out.println("Usage: cd <directory>");
+                            logger.log(Level.INFO, "Usage: cd <directory>");
                         }
                         break;
                     case "cp":
@@ -39,7 +45,7 @@ public class FileManager {
                             String destination = commandSplit[2];
                             copyFile(source, destination);
                         } else {
-                            System.out.println("Usage: cd <source> <target>");
+                            logger.log(Level.INFO,"Usage: cd <source> <target>");
                         }
                         break;
                     case "ls":
@@ -49,7 +55,7 @@ public class FileManager {
                         printWorkingDirectory();
                         break;
                     default:
-                        System.out.println("Unknown command " + firstCommand);
+                        logger.log(Level.INFO,"Unknown command " + firstCommand);
                         break;
                 }
             } catch (IOException e) {
@@ -59,7 +65,7 @@ public class FileManager {
     }
 
     private void printWorkingDirectory() {
-        System.out.println(currentDirectory);
+        logger.info(currentDirectory);
     }
 
     private void listFiles() {
@@ -67,7 +73,7 @@ public class FileManager {
         File[] files = file.listFiles();
         if (files != null) {
             for (File f : files) {
-                System.out.println(f.getName());
+                logger.info(f.getName());
             }
         }
     }
@@ -83,7 +89,7 @@ public class FileManager {
         if (file.isDirectory()) {
             currentDirectory = newPath;
         } else {
-            System.out.println("Error! " + newPath + " is not a directory");
+            logger.info("Error! " + newPath + " is not a directory");
         }
     }
 
@@ -95,10 +101,10 @@ public class FileManager {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 bufferedWriter.write(line);
-                System.out.println("File copied successfully.");
+                logger.info("File copied successfully.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOError(e);
         }
     }
 }
