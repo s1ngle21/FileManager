@@ -25,13 +25,12 @@ public class FileManagerNIO {
         BufferedReader reader = null;
 
         try {
-
             while (true) {
-                logger.log(Level.INFO, currentDirectory);
+                logger.info(currentDirectory);
                 String line;
                 reader = new BufferedReader(new InputStreamReader(System.in));
                 line = reader.readLine();
-                String[] commandSplit = line.trim().split("\\+s");
+                String[] commandSplit = line.trim().split("\s");
                 if (commandSplit.length == 0) {
                     continue;
                 }
@@ -43,7 +42,7 @@ public class FileManagerNIO {
                     case "cp" -> copy(commandSplit);
                     case "ls" -> listFiles();
                     case "pwd" -> printWorkingDirectory();
-                    default -> logger.log(Level.INFO, "Unknown command " + firstCommand);
+                    default -> logger.info("Unknown command " + firstCommand);
                 }
             }
         } catch (IOException e) {
@@ -64,7 +63,7 @@ public class FileManagerNIO {
             String target = commandSplit[1];
             changeDirectory(target);
         } else {
-            logger.log(Level.INFO, "Usage: cd <directory>");
+            logger.info("Usage: cd <directory>");
         }
     }
 
@@ -74,7 +73,7 @@ public class FileManagerNIO {
             String destination = commandSplit[2];
             copyFiles(source, destination);
         } else {
-            logger.log(Level.INFO, "Usage: cp <source> <target>");
+            logger.info("Usage: cp <source> <target>");
         }
     }
 

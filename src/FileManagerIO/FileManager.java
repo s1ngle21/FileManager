@@ -18,7 +18,8 @@ public class FileManager {
         while (true) {
             logger.log(Level.INFO, currentDirectory);
             String line = null;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            try  {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
                 line = reader.readLine();
                 String[] commandSplit = line.trim().split("\\s+");
                 if (commandSplit.length == 0) {
