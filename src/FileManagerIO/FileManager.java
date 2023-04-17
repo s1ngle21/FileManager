@@ -31,21 +31,11 @@ public class FileManager {
                 }
                 String firstCommand = commandSplit[0];
                 switch (firstCommand) {
-                    case "cd":
-                       changeDirectory(commandSplit);
-                        break;
-                    case "cp":
-                       copy(commandSplit);
-                        break;
-                    case "ls":
-                        listFiles();
-                        break;
-                    case "pwd":
-                        printWorkingDirectory();
-                        break;
-                    default:
-                        logger.log(Level.INFO, "Unknown command " + firstCommand);
-                        break;
+                    case "cd" -> changeDirectory(commandSplit);
+                    case "cp" -> copy(commandSplit);
+                    case "ls" -> listFiles();
+                    case "pwd" -> printWorkingDirectory();
+                    default -> logger.log(Level.INFO, "Unknown command " + firstCommand);
                 }
             }
         } catch (IOException e) {
