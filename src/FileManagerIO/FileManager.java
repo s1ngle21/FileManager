@@ -17,36 +17,25 @@ public class FileManager {
 
     public void start() {
 
-        while (true) {
+        BufferedReader reader = null;
 
-            logger.log(Level.INFO, currentDirectory);
-
-            String line = null;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+        try {
+            while (true) {
+                logger.log(Level.INFO, currentDirectory);
+                String line = null;
+                reader = new BufferedReader(new InputStreamReader(System.in));
                 line = reader.readLine();
                 String[] commandSplit = line.trim().split("\\s+");
                 if (commandSplit.length == 0) {
                     continue;
                 }
                 String firstCommand = commandSplit[0];
-
                 switch (firstCommand) {
                     case "cd":
-                        if (commandSplit.length > 1) {
-                            String target = commandSplit[1];
-                            changeDirectory(target);
-                        } else {
-                            logger.log(Level.INFO, "Usage: cd <directory>");
-                        }
+                       changeDirectory(commandSplit);
                         break;
                     case "cp":
-                        if (commandSplit.length > 2) {
-                            String source = commandSplit[1];
-                            String destination = commandSplit[2];
-                            copyFile(source, destination);
-                        } else {
-                            logger.log(Level.INFO,"Usage: cd <source> <target>");
-                        }
+                       copy(commandSplit);
                         break;
                     case "ls":
                         listFiles();
@@ -55,12 +44,39 @@ public class FileManager {
                         printWorkingDirectory();
                         break;
                     default:
-                        logger.log(Level.INFO,"Unknown command " + firstCommand);
+                        logger.log(Level.INFO, "Unknown command " + firstCommand);
                         break;
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Error has occurred while closing BufferedReader", e);
+                }
+            }
+        }
+    }
+
+    private void changeDirectory(String[] commandSplit) {
+        if (commandSplit.length > 1) {
+            String target = commandSplit[1];
+            changeDirectory(target);
+        } else {
+            logger.log(Level.INFO, "Usage: cd <directory>");
+        }
+    }
+
+    private void copy(String[] commandSplit) {
+        if (commandSplit.length > 2) {
+            String source = commandSplit[1];
+            String destination = commandSplit[2];
+            copyFile(source, destination);
+        } else {
+            logger.log(Level.INFO, "Usage: cp <source> <target>");
         }
     }
 
@@ -89,7 +105,7 @@ public class FileManager {
         if (file.isDirectory()) {
             currentDirectory = newPath;
         } else {
-            logger.info("Error! " + newPath + " is not a directory");
+            logger.warning("Error! " + newPath + " is not a directory");
         }
     }
 
@@ -101,10 +117,10 @@ public class FileManager {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 bufferedWriter.write(line);
-                logger.info("File copied successfully.");
             }
+            logger.info("File copied successfully.");
         } catch (IOException e) {
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
     }
 }
