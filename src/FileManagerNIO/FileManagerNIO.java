@@ -30,7 +30,7 @@ public class FileManagerNIO {
                 String line;
                 reader = new BufferedReader(new InputStreamReader(System.in));
                 line = reader.readLine();
-                String[] commandSplit = line.trim().split("\s");
+                String[] commandSplit = line.trim().split("\\s+");
                 if (commandSplit.length == 0) {
                     continue;
                 }
