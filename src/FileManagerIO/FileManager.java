@@ -31,7 +31,7 @@ public class FileManager {
                 }
                 String firstCommand = commandSplit[0];
                 switch (firstCommand) {
-                    case "cd" -> changeDirectory(commandSplit);
+                    case "cd" -> CD(commandSplit);
                     case "cp" -> copy(commandSplit);
                     case "ls" -> listFiles();
                     case "pwd" -> printWorkingDirectory();
@@ -51,7 +51,7 @@ public class FileManager {
         }
     }
 
-    private void changeDirectory(String[] commandSplit) {
+    private void CD(String[] commandSplit) {
         if (commandSplit.length > 1) {
             String target = commandSplit[1];
             changeDirectory(target);
