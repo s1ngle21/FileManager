@@ -22,12 +22,14 @@ public class FileManagerNIO {
 
     public void start() {
 
-        while (true) {
+        BufferedReader reader = null;
 
-            logger.log(Level.INFO,currentDirectory);
-            String line = null;
+        try {
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            while (true) {
+                logger.log(Level.INFO, currentDirectory);
+                String line;
+                reader = new BufferedReader(new InputStreamReader(System.in));
                 line = reader.readLine();
                 String[] commandSplit = line.trim().split("\\+s");
                 if (commandSplit.length == 0) {
@@ -37,63 +39,68 @@ public class FileManagerNIO {
                 String firstCommand = commandSplit[0];
 
                 switch (firstCommand) {
-                    case "cd":
-                        if (commandSplit.length > 1) {
-                            String path = commandSplit[1];
-                            changeDirectory(path);
-                        } else {
-                            logger.log(Level.INFO,"Usage: cd <directory>");
-                        }
-                        break;
-                    case "cp":
-                        if (commandSplit.length > 2) {
-                            String source = commandSplit[0];
-                            String target = commandSplit[1];
-                            copyFiles(source, target);
-                        } else {
-                            logger.log(Level.INFO,"Usage: cd <source> <target>");
-                        }
-                        break;
-                    case "ls":
-                        listFiles();
-                        break;
-                    case "pwd":
-                        printWorkingDirectory();
-                        break;
-                    default:
-                        logger.log(Level.INFO,"Unknown command " + firstCommand);
-                        break;
+                    case "cd" -> CD(commandSplit);
+                    case "cp" -> copy(commandSplit);
+                    case "ls" -> listFiles();
+                    case "pwd" -> printWorkingDirectory();
+                    default -> logger.log(Level.INFO, "Unknown command " + firstCommand);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Error has occurred while closing BufferedReader", e);
+                }
             }
         }
+    }
 
+    private void CD(String[] commandSplit) {
+        if (commandSplit.length > 1) {
+            String target = commandSplit[1];
+            changeDirectory(target);
+        } else {
+            logger.log(Level.INFO, "Usage: cd <directory>");
+        }
+    }
+
+    private void copy(String[] commandSplit) {
+        if (commandSplit.length > 2) {
+            String source = commandSplit[1];
+            String destination = commandSplit[2];
+            copyFiles(source, destination);
+        } else {
+            logger.log(Level.INFO, "Usage: cp <source> <target>");
+        }
     }
 
     private void printWorkingDirectory() {
-        logger.log(Level.INFO,currentDirectory);
+        logger.info(currentDirectory);
     }
 
     private void listFiles() {
         Path dir = Paths.get(currentDirectory);
-        DirectoryStream<Path> stream = null;
-        try {
-            stream = Files.newDirectoryStream(dir);
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)){
+            for (Path file : stream) {
+                logger.info(String.valueOf(file.getFileName()));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        for (Path file : stream) {
-            logger.log(Level.INFO, String.valueOf(file.getFileName()));
         }
     }
 
     private void copyFiles(String source, String target) {
-        Path pathSource = Paths.get(source);
-        Path pathTarget = Paths.get(target);
+
         try {
+            Path pathSource = Paths.get(source);
+            Path pathTarget = Paths.get(target);
             Files.copy(pathSource, pathTarget);
-            logger.log(Level.INFO,"File copied successfully.");
+            logger.info("File copied successfully.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -110,7 +117,7 @@ public class FileManagerNIO {
         if (Files.isDirectory(file)) {
             currentDirectory = newPath;
         } else {
-            logger.log(Level.INFO,"Error! " + newPath + " is not a directory");
+            logger.warning("Error! " + newPath + " is not a directory");
         }
     }
 }
