@@ -38,7 +38,7 @@ public class FileManagerNIO {
                 String firstCommand = commandSplit[0];
 
                 switch (firstCommand) {
-                    case "cd" -> CD(commandSplit);
+                    case "cd" -> changeDirectory(commandSplit);
                     case "cp" -> copy(commandSplit);
                     case "ls" -> listFiles();
                     case "pwd" -> printWorkingDirectory();
@@ -52,13 +52,13 @@ public class FileManagerNIO {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    logger.log(Level.WARNING, "Error has occurred while closing BufferedReader", e);
+                    logger.log(Level.SEVERE,"Error has occurred while closing BufferedReader", e);
                 }
             }
         }
     }
 
-    private void CD(String[] commandSplit) {
+    private void changeDirectory(String[] commandSplit) {
         if (commandSplit.length > 1) {
             String target = commandSplit[1];
             changeDirectory(target);
@@ -116,7 +116,7 @@ public class FileManagerNIO {
         if (Files.isDirectory(file)) {
             currentDirectory = newPath;
         } else {
-            logger.warning("Error! " + newPath + " is not a directory");
+            logger.severe("Error! " + newPath + " is not a directory");
         }
     }
 }
